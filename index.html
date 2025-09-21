@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Automated OMR Scoring System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .container { max-width: 960px; }
+        .result-img { max-width: 100%; height: auto; border: 1px solid #dee2e6; border-radius: .25rem; }
+        .card { margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center">
+            <h1 class="display-5">Automated OMR Evaluation System 🚀</h1>
+            <p class="lead">Upload an OMR sheet image to automatically grade it.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Upload OMR Sheet</h5>
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Select Image File (JPG, PNG)</label>
+                        <input class="form-control" type="file" name="file" id="file" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Evaluate Sheet</button>
+                </form>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert alert-danger mt-3">
+                      {% for message in messages %}
+                        {{ message }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="card">
+            <div class="card-header">
+                <h3>Evaluation Results</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <h4>Total Score: <strong>{{ result.score }}</strong></h4>
+                </div>
+                <h5>Subject-wise Scores:</h5>
+                <ul class="list-group mb-4">
+                    {% for subject, score in result.subject_scores.items() %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ subject }}
+                            <span class="badge bg-primary rounded-pill">{{ score }} / 20</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Original Image</h5>
+                        <img src="{{ url_for('static', filename='uploads/' + result.original_image.split('/')[-1]) }}" alt="Original OMR Sheet" class="result-img">
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Processed Image (Graded)</h5>
+                        <img src="{{ url_for('static', filename='processed/' + result.result_image.split('/')[-1]) }}" alt="Processed OMR Sheet" class="result-img">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
